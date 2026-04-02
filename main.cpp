@@ -78,7 +78,6 @@ void train() {
         last_loss = g.nodes[loss].data;
 
         // backward
-
         zero_grad(g, net.params);
         g.backward(loss);
         sgd_step(g, net.params, 0.01);
