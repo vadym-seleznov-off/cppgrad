@@ -40,3 +40,28 @@ struct Neuron {
         dist.push_back(b);
     }
 };
+
+struct Layer {
+    std::vector<Neuron> neurons;
+
+    Layer(Graph& g, size_t nin, size_t nout, bool nonlin, std::mt19937& rng) {
+        neurons.reserve(nout);
+        for(size_t i = 0; i < nout; ++i) {
+            neurons.emplace_back(g, nin, nonlin, rng);
+        }
+    }
+
+    [[nodiscard]] std::vector<Value> forwad(Graph& g, const std::vector<Value>& x) const {
+        std::vector<Value> out;
+
+        out.reserve(neurons.size());
+        for(const auto& n : neurons) {
+            out.push_back(n.forward(g, x));
+        }
+        return out;
+    }
+
+    void collect_params(std::vector<Value>& dist) const {
+        for (const auto& n : neurons) n.collect_params(dist);
+    }
+};
