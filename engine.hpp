@@ -99,6 +99,8 @@ public:
         return nodes.size() - 1;
     }
 
+    // BECAUSE WE USE ARENA ALLOCATOR
+    // WE DON'T NEED TOPO SORT HERE
     void backward(Value root) {
         for (auto& n : nodes) n.grad = 0.0;
         nodes[root].grad = 1.0;
