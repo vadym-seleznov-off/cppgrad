@@ -26,4 +26,17 @@ struct Neuron {
             w.push_back(g.value(dist(rng)));
         }
     }
+
+    [[nodiscard]] Value forward(Graph& g, const std::vector<Value>& x) const {
+        Value act = b;
+        for(size_t i = 0; i < w.size(); ++i) {
+            act = g.add(act, g.mul(x[i], w[i]));
+        }
+        return nonlin ? g.tanh(act) : act;
+    }
+
+    void collect_params(std::vector<Value>& dist) const {
+        dist.insert(dist.end(), w.begin(), w.end());
+        dist.push_back(b);
+    }
 };
