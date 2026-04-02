@@ -88,7 +88,7 @@ struct MLP {
         for(const auto& l : layers) {
             x = l.forwad(g, x);
         }
-        
+
         return x;
     }
 };
