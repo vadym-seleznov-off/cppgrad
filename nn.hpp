@@ -65,3 +65,30 @@ struct Layer {
         for (const auto& n : neurons) n.collect_params(dist);
     }
 };
+
+struct MLP {
+    std::vector<Layer> layers;
+    std::vector<Value> params;
+
+    MLP(Graph& g, size_t nin, const std::vector<size_t>& nouts) {
+        std::mt19937 rng(std::random_device{}());
+        layers.reserve(nouts.size());
+
+        size_t prev = nin;
+        for(size_t i = 0; i < nouts.size(); ++i) {
+            bool nonlin = (i + 1 != nouts.size());
+            layers.emplace_back(g, prev, nouts[i], nonlin, rng);
+            prev = nouts[i];
+        }
+
+        for (const auto& l : layers) l.collect_params(params);
+    }
+
+    [[nodiscard]] std::vector<Value> forward(Graph& g, std::vector<Value> x) const {
+        for(const auto& l : layers) {
+            x = l.forwad(g, x);
+        }
+        
+        return x;
+    }
+};
