@@ -45,7 +45,7 @@ public:
             .data = nodes[a].data * nodes[b].data,
             .left = a,
             .right = b,
-            .op = Op::Add,
+            .op = Op::Mul,
         });
 
         return nodes.size() - 1;
@@ -105,32 +105,38 @@ public:
 
         for(auto i = static_cast<ptrdiff_t>(nodes.size()) - 1; i >= 0; --i) {
             const auto [data, grad, left, right, op] = nodes[i];
-
-            switch(op) {
+            
+             switch (op) {
                 case Op::Add:
-                    nodes[left].grad += grad;
+                    nodes[left].grad  += grad;
                     nodes[right].grad += grad;
                     break;
+
                 case Op::Mul:
-                    nodes[left].grad += nodes[right].data * grad;
-                    nodes[left].grad += nodes[right].data * grad;
+                    nodes[left].grad  += nodes[right].data * grad;
+                    nodes[right].grad += nodes[left].data  * grad;
                     break;
+
                 case Op::ReLU:
                     if (nodes[left].data > 0.0) nodes[left].grad += grad;
                     break;
+
                 case Op::Tanh:
                     nodes[left].grad += (1.0 - data * data) * grad;
                     break;
-                case Op::Pow:
-                    double e = nodes[right].data;
-                    nodes[left].grad += e * std::pow(nodes[left].data, e - 1.0) * grad;
-                    break;
+
                 case Op::Exp:
                     nodes[left].grad += data * grad;
                     break;
 
-                case Op::None: break;
+                case Op::Pow: {
+                    double e = nodes[right].data;
+                    nodes[left].grad += e * std::pow(nodes[left].data, e - 1.0) * grad;
+                    break;
                 }
+
+                case Op::None: break;
+            }
         }
     }
 };
