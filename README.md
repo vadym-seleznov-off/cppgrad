@@ -5,4 +5,4 @@
 ![CAT](cat.avif)
 
 # How to run it?
-## ``bash cmake -B build && cmake --build build && ./build/cppgrad``
+## ``cmake -B build && cmake --build build && ./build/cppgrad``
