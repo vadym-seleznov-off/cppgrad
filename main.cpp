@@ -51,6 +51,7 @@ void train() {
     constexpr double ys[4] = {1.0, -1.0, -1.0, 1.0};
 
     const size_t params_count = net.params.size();
+    std::cout << "Params count of net: " << params_count << '\n';
     double last_loss = 0.0;
 
     const int EPOCHS = 100;
@@ -78,11 +79,10 @@ void train() {
         last_loss = g.nodes[loss].data;
 
         // backward
-        zero_grad(g, net.params);
         g.backward(loss);
         sgd_step(g, net.params, 0.01);
 
-        std::cout << "Epoch " << epoch << ": loss " << last_loss << '\n';
+        std::cout << "Epoch: " << epoch << ": loss " << last_loss << '\n';
     }
 
     assert(last_loss < 1.0 && "training did not coverge");

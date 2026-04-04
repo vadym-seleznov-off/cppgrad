@@ -3,14 +3,9 @@
 #include <vector>
 #include <random>
 
-inline void zero_grad(Graph& g, const std::vector<Value>& params) {
-    for (Value p : params) g.nodes[p].grad = 0.0;
-}
-
 inline void sgd_step(Graph& g, const std::vector<Value>& params, double lr) {
     for (Value p : params) g.nodes[p].data -= lr * g.nodes[p].grad;
 }
-
 
 struct Neuron {
     std::vector<Value> w;
