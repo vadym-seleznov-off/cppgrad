@@ -51,6 +51,7 @@ void train() {
     constexpr double ys[4] = {1.0, -1.0, -1.0, 1.0};
 
     const size_t params_count = net.params.size();
+    // 41 because: 4 * (3 + 1) + 4 * (4 + 1) + 4 * 1 + 1 = 41
     std::cout << "Params count of net: " << params_count << '\n';
     double last_loss = 0.0;
 
