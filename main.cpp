@@ -1,7 +1,10 @@
 #include <iostream>
 #include "engine.hpp"
+#include <cmath>
 #include "nn.hpp"
 #include <array>
+
+#define XOR 1
 
 void manual_backprop_demo() {
     Graph g;
@@ -29,7 +32,7 @@ void manual_backprop_demo() {
     check(a,  6.0);
     check(b, -4.0);
 
-    std::cout << "We are completely right!\n";
+    std::cout << "Manual backpropagation test passed!\n";
 }
 
 void train() {
@@ -90,7 +93,63 @@ void train() {
     std::cout << "Training passed!\n";
 }
 
+void xor_test() {
+    Graph g; 
+
+    const std::vector<size_t> arch = {4, 4, 1};
+    MLP net(g, 2, arch);
+
+    constexpr double xs[4][2] = {
+        {0.0, 0.0},
+        {0.0, 1.0},
+        {1.0, 0.0},
+        {1.0, 1.0},
+    };
+
+    constexpr double ys[4] = {0.0, 1.0, 1.0, 0.0};
+
+    const size_t params_count = net.params.size();
+
+    double last_loss = 0.0;
+    
+    const int EPOCHS = 1000;
+
+    for(int i = 0; i < EPOCHS; ++i) {
+        g.nodes.resize(params_count);
+
+        std::array<Value, 4> preds;
+        for(int j = 0; j < 4; ++j) {
+            std::vector<Value> x;
+            x.reserve(2);
+            for (double v : xs[j]) x.push_back(g.value(v));
+            preds[j] = net.forward(g, std::move(x))[0];
+        }
+
+        Value loss = g.value(0.0);
+
+        for (int s = 0; s < 4; ++s) {
+            Value diff = g.sub(preds[s], g.value(ys[s]));
+            loss = g.add(loss, g.powf(diff, 2.0));
+        }
+        
+        last_loss = g.nodes[loss].data;
+
+        // backward
+        g.backward(loss);
+        sgd_step(g, net.params, 0.01);
+
+        std::cout << "Epoch: " << i << ": loss " << last_loss << '\n';
+    }
+
+    assert(last_loss < 1.0 && "training did not coverge");
+    std::cout << "Training passed!\n";
+}
+
 int main() {
     manual_backprop_demo();
+#if XOR
+    xor_test(); 
+#else
     train();
+#endif
 }

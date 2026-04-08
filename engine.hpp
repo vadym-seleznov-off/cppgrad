@@ -8,7 +8,7 @@
 using Value = size_t;
 inline constexpr Value kNull = ~Value{0};
 
-enum class Op : uint8_t { Add, Mul, Pow, Tanh, ReLU, Exp, None };
+enum class Op : uint8_t { Add, Mul, Pow, Tanh, ReLU, Sigmoid, Exp, None };
 
 struct Node {
     double data = 0.0;
@@ -72,6 +72,16 @@ public:
         return nodes.size() - 1;
     }
 
+    [[nodiscard]] Value sigmoid(Value a) {
+        nodes.push_back({
+            .data = 1.0 / (1.0 + std::exp(-nodes[a].data)),
+            .left = a,
+            .op = Op::Sigmoid,
+        });
+
+        return nodes.size() - 1;
+    }
+
     [[nodiscard]] Value relu(Value a) {
         nodes.push_back({
             .data = nodes[a].data > 0.0 ? nodes[a].data : 0.0,
@@ -117,6 +127,10 @@ public:
                 case Op::Mul:
                     nodes[left].grad  += nodes[right].data * grad;
                     nodes[right].grad += nodes[left].data  * grad;
+                    break;
+
+                case Op::Sigmoid:
+                    nodes[left].grad += data * (1.0 - data) * grad; 
                     break;
 
                 case Op::ReLU:
