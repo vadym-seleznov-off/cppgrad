@@ -11,7 +11,7 @@ void manual_backprop_demo() {
 
     auto a = g.value( 2.0);
     auto b = g.value(-3.0);
-    auto e = g.mul(a, b);           // e =  a * b  = -6
+    auto e = g.mul(a, b);               // e =  a * b  = -6
     auto c = g.value(10.0);
     auto d = g.add(e, c);           // d =  e + c  =  4
     auto f = g.value(-2.0);
